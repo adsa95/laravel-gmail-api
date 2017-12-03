@@ -9,11 +9,15 @@
   "license": "MIT",
   "authors": [
     {
+      "name": "Adam Sandström",
+      "email": "adam@adsa.se"
+    },{
       "name": "Martijn Wagena",
       "email": "martijn@wagena.com"
     }
   ],
   "require": {
+    "php": ">=5.5.9",
     "illuminate/support": "5.0.*|5.1.*|5.2.*|5.3.*|5.4.*",
     "google/apiclient": "^2.0",
     "nesbot/carbon": "^1.22",
