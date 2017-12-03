@@ -122,6 +122,15 @@ class Gmail {
         return $this;
     }
 
+    /**
+     * @return array
+     */
+    public function getAccessTokens(){
+        return [
+            "access_token" => $this->accessToken,
+            "refresh_token" => $this->refreshToken
+        ];
+    }
 
     /**
      * @return array
