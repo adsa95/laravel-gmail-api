@@ -133,6 +133,13 @@ class Gmail {
     }
 
     /**
+     * @return string
+     */
+    public function getEmailAddress(){
+        return $this->emailAddress;
+    }
+
+    /**
      * @return array
      */
     private function formatAccessToken() {
