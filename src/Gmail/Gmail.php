@@ -75,28 +75,6 @@ class Gmail {
         if($me) {
             $this->emailAddress = $me->emailAddress;
         }
-
-
-        return $this->saveAccessToken();
-    }
-
-    /**
-     * @param bool $update
-     * @return static
-     */
-    public function saveAccessToken() {
-        $config = json_decode(
-            File::get(
-                $file = storage_path('gmail-' . $this->emailAddress . 'json')
-            ),
-            true
-        );
-
-        $config['access_token'] = $this->accessToken;
-        $config['refresh_token'] = $this->refreshToken;
-        $config['email'] = $this->emailAddress;
-
-        File::put($file, json_encode($config));
     }
 
     /**
