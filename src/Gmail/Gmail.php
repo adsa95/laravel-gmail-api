@@ -48,6 +48,7 @@ class Gmail {
         $this->client->setScopes($this->scopes);
         $this->client->setAuthConfig($this->getAuthConfig());
         $this->client->setAccessType('offline');
+        $this->client->setApprovalPrompt('force');
         $this->client->setRedirectUri($this->config['redirect_uri']);
         return $this->client;
     }
