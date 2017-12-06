@@ -4,6 +4,7 @@ namespace MartijnWagena\Gmail;
 
 use Google_Client;
 use Google_Service_Gmail;
+use Illuminate\Support\Facades\Config;
 
 class Gmail {
 
@@ -11,9 +12,14 @@ class Gmail {
     protected $scopes;
     protected $accessToken;
     protected $emailAddress;
+    protected $tokenPackage;
 
-    public function __construct($config = [])
+    public function __construct($config)
     {
+        if(!$config){
+            $config = Config::get('gmail');
+        }
+
         $this->config = $config;
 
         $this->scopes = implode(' ', [
