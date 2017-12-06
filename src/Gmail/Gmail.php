@@ -71,10 +71,10 @@ class Gmail {
     public function makeAccessToken($code) {
         $this->getClient();
 
-        $accessToken = $this->client->fetchAccessTokenWithAuthCode($code);
+        $this->tokenPackage = $this->client->fetchAccessTokenWithAuthCode($code);
 
-        $this->accessToken = $accessToken['access_token'];
-        $this->refreshToken = $accessToken['refresh_token'];
+        $this->accessToken = $this->tokenPackage['access_token'];
+        $this->refreshToken = $this->tokenPackage['refresh_token'];
 
         $this->client->setAccessToken($this->formatAccessToken());
 
@@ -140,6 +140,22 @@ class Gmail {
     }
 
     /**
+     * @return array
+     */
+    public function getTokenPackage(){
+        return $this->tokenPackage;
+    }
+
+    /*
+     * @param array
+     */
+    public function setTokenPackage($tokenPackage){
+        $this->getClient();
+        $this->client->setAccessToken($tokenPackage);
+        $this->tokenPackage = $tokenPackage;
+    }
+
+    /**
      * @return string
      */
     public function getEmailAddress(){
@@ -150,13 +166,8 @@ class Gmail {
      * @return array
      */
     private function formatAccessToken() {
-        return [
-            "access_token" => $this->accessToken,
-            "token_type" => "Bearer",
-            "expires_in" => 3600,
-            "refresh_token" => $this->refreshToken,
-            "created" => 1492614871
-        ];
+        // only here for compatibility reasons
+        return $this->tokenPackage;
     }
 
     /**
