@@ -182,7 +182,7 @@ class Mail extends Gmail
      */
     private function getHtmlBody($body) {
 
-        return base64url_decode($body->getBody()->data);
+        return base64_decode($body->getBody()->data);
     }
 
     /**
@@ -190,7 +190,7 @@ class Mail extends Gmail
      * @return string
      */
     private function getRawBody($body) {
-        return base64url_decode($body->getBody()->data);
+        return base64_decode($body->getBody()->data);
     }
 
     /**
@@ -201,7 +201,7 @@ class Mail extends Gmail
     private function getAttachment($messageId, $attachmentId) {
         $attachment = $this->service->users_messages_attachments->get('me', $messageId, $attachmentId);
 
-        return base64url_decode($attachment->getData());
+        return base64_decode($attachment->getData());
     }
 
     /**
