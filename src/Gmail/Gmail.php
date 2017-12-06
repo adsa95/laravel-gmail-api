@@ -61,7 +61,7 @@ class Gmail {
         $this->getClient();
         $authUrl = $this->client->createAuthUrl();
 
-        return compact('authUrl');
+        return $authUrl;
     }
 
     /**
