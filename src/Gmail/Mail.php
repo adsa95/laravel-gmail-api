@@ -102,7 +102,7 @@ class Mail extends Gmail
         $message['parent_id'] = $this->findProperty($headers, 'References');
 
         // Set Date
-        $message['date'] = Carbon::parse($this->findProperty($headers, 'Date'));
+        $message['date'] = Carbon::createFromTimestamp(substr($mail->internalDate, 0, -3));
 
         // Set receiving user
         $message['to'] = $this->mapContacts($this->findProperty($headers, 'To'));
