@@ -14,7 +14,7 @@ class Gmail {
     protected $emailAddress;
     protected $tokenPackage;
 
-    public function __construct($config)
+    public function __construct($config = null)
     {
         if(!$config){
             $config = Config::get('gmail');
