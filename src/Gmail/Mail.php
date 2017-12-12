@@ -120,7 +120,7 @@ class Mail extends Gmail
 
         // Set Reply-to when available
         if($replyTo = $this->findProperty($headers, 'Reply-To')) {
-            $message['reply-to'] = $replyTo;
+            $message['reply-to'] = $this->mapContact($replyTo);
         }
 
         if($m->parts) {
