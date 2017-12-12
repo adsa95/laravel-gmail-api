@@ -33,60 +33,62 @@ class Send extends Gmail
      * @return array
      * @internal param null $parent
      */
-    public function sendMail($to = [], $cc = [], $bcc = [], $subject = null, $message_body = null, $in_reply_to = null, $files = [])
+    public function sendMail($to = [], $cc = [], $bcc = [], $subject = null, $message_body = null, $in_reply_to = null, $files = [], $thread_id = null)
     {
-        if($this->accessToken && $this->refreshToken) {
+        $message = Swift_Message::newInstance();
+        $message->setTo($to);
 
-            $message = Swift_Message::newInstance();
-            $message->setTo($to);
+        if (!empty($cc)) {
+            $message->setCc($cc);
+        }
 
-            if (!empty($cc)) {
-                $message->setCc($cc);
+        if (!empty($bcc)) {
+            $message->setBcc($bcc);
+        }
+
+        if (!empty($in_reply_to)) {
+            $headers = $message->getHeaders();
+            $headers->addTextHeader('In-Reply-To', $in_reply_to);
+            $headers->addTextHeader('References', $in_reply_to);
+        }
+
+        $message->setBody($message_body, 'text/html');
+
+
+        if(!is_null($in_reply_to)) {
+            if(stripos($subject, 're:') === false) {
+                $subject = 'Re: ' . $subject;
             }
+        }
+        $message->setSubject($subject);
 
-            if (!empty($bcc)) {
-                $message->setBcc($bcc);
+        if(!empty($files)) {
+            foreach ($files as $file) {
+                $message->attach(Swift_Attachment::fromPath($file->getRealPath())->setFilename($file->getClientOriginalName()));
             }
-
-            if (!empty($in_reply_to)) {
-                $headers = $message->getHeaders();
-                $headers->addTextHeader('In-Reply-To', $in_reply_to);
-                $headers->addTextHeader('References', $in_reply_to);
-            }
-
-            $message->setBody($message_body, 'text/html');
-
-
-            if(!is_null($in_reply_to)) {
-                if(stripos($subject, 're:') === false) {
-                    $subject = 'Re: ' . $subject;
-                }
-            }
-            $message->setSubject($subject);
-
-            if(!empty($files)) {
-                foreach ($files as $file) {
-                    $message->attach(Swift_Attachment::fromPath($file->getRealPath())->setFilename($file->getClientOriginalName()));
-                }
-            }
+        }
 
         $gm_message = new Google_Service_Gmail_Message();
         $gm_message->setRaw(Base64Url::encode($message->toString()));
 
-            $sent = $this->service->users_messages->send('me', $gm_message);
-            if($sent) {
+        if(!is_null($thread_id)) {
+            $gm_message->setThreadId($thread_id);
+        }
 
-                $msg = $this->service->users_messages->get('me', $sent->id);
+        $sent = $this->service->users_messages->send('me', $gm_message);
+        if($sent) {
 
-                // Collect headers
-                $headers = collect($msg->getPayload()->headers);
+            $msg = $this->service->users_messages->get('me', $sent->id);
 
-                return [
-                    'id' => $sent->id,
-                    'Message-Id' => $this->findProperty($headers, 'Message-Id'),
-                ];
-            }
+            // Collect headers
+            $headers = collect($msg->getPayload()->headers);
 
+            return [
+                'id' => $sent->id,
+                'Message-Id' => $this->findProperty($headers, 'Message-Id'),
+            ];
+        }else{
+            return 'Error';
         }
     }
 }
