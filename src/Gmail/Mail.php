@@ -5,6 +5,7 @@ namespace MartijnWagena\Gmail;
 use Carbon\Carbon;
 use Google_Service_Gmail;
 use Illuminate\Support\Collection;
+use Base64Url\Base64Url;
 
 class Mail extends Gmail
 {
@@ -182,7 +183,7 @@ class Mail extends Gmail
      */
     private function getHtmlBody($body) {
 
-        return base64_decode($body->getBody()->data);
+        return Base64Url::decode($body->getBody()->data);
     }
 
     /**
@@ -190,7 +191,7 @@ class Mail extends Gmail
      * @return string
      */
     private function getRawBody($body) {
-        return base64_decode($body->getBody()->data);
+        return Base64Url::decode($body->getBody()->data);
     }
 
     /**
@@ -201,7 +202,7 @@ class Mail extends Gmail
     private function getAttachment($messageId, $attachmentId) {
         $attachment = $this->service->users_messages_attachments->get('me', $messageId, $attachmentId);
 
-        return base64_decode($attachment->getData());
+        return Base64Url::decode($attachment->getData());
     }
 
     /**

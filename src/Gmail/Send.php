@@ -6,6 +6,7 @@ use Google_Service_Gmail;
 use Google_Service_Gmail_Message;
 use Swift_Attachment;
 use Swift_Message;
+use Base64Url\Base64Url;
 
 class Send extends Gmail
 {
@@ -69,8 +70,8 @@ class Send extends Gmail
                 }
             }
 
-            $gm_message = new Google_Service_Gmail_Message();
-            $gm_message->setRaw(base64url_encode($message->toString()));
+        $gm_message = new Google_Service_Gmail_Message();
+        $gm_message->setRaw(Base64Url::encode($message->toString()));
 
             $sent = $this->service->users_messages->send('me', $gm_message);
             if($sent) {
