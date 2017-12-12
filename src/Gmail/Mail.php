@@ -26,7 +26,7 @@ class Mail extends Gmail
      * @param $date
      * @return $this
      */
-    public function setStartDate(\DateTime $date) {
+    public function setStartDate(Carbon $date) {
         $this->start_date = $date->getTimestamp();
 
         return $this;
