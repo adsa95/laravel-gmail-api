@@ -18,10 +18,10 @@
   ],
   "require": {
     "php": ">=5.5.9",
-    "illuminate/support": "5.0.*|5.1.*|5.2.*|5.3.*|5.4.*",
+    "illuminate/support": "5.5.*",
     "google/apiclient": "^2.0",
     "nesbot/carbon": "^1.22",
-    "swiftmailer/swiftmailer": "^5.4",
+    "swiftmailer/swiftmailer": "^6.0",
     "spomky-labs/base64url": "^1.0"
   },
   "autoload": {
