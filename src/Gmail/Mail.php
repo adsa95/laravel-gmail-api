@@ -68,7 +68,7 @@ class Mail extends Gmail
         $mail = $this->service->users_messages->get('me', $messageId, ['format' => 'full']);
 
         // Get actual mail payload
-        $m = $mail->getPayload();
+        $payload = $mail->getPayload();
 
         $message = [
             'id' => $messageId,
@@ -89,7 +89,7 @@ class Mail extends Gmail
         ];
 
         // Collect headers
-        $headers = collect($m->headers);
+        $headers = collect($payload->headers);
 
         // Set MessageId
         $message_id = $this->findProperty($headers, 'Message-Id');
@@ -123,75 +123,98 @@ class Mail extends Gmail
             $message['reply-to'] = $this->mapContact($replyTo);
         }
 
-        if($m->parts) {
-
-            // Set body data
-            foreach ($m->parts as $key => $part) {
-
-                if ($key == 0 && $part['mimeType'] == 'text/plain') {
-                    // plain text
-                    $message['body']['text'] = $this->getRawBody($part);
-
-                } else {
-
-                    // html/text version and attachments
-                    if(isset($part['parts'])) {
-                        foreach ($part['parts'] as $p) {
-
-                            // determine if its an attachment
-                            if (isset($p['filename']) && !empty($p['filename'])) {
-                                $filename = $p['filename'];
-                                $attachmentId = $p['body']['attachmentId'];
-                                $message['attachments'][] = [
-                                    'mimeType' => $p['mimeType'],
-                                    'contents' => $this->getAttachment($messageId, $attachmentId),
-                                    'filename' => $filename,
-                                ];
-
-                            } else {
-
-                                if ($p['mimeType'] == 'text/plain') {
-                                    // plain text
-                                    $message['body']['text'] = $this->getRawBody($p);
-
-                                } else {
-                                    // otherwise its the html body
-                                    $message['body']['html'] = $this->getHtmlBody($p);
-                                }
-
-                            }
-                        }
-                    } else {
-                        if ($part['mimeType'] == 'text/html') {
-                            $message['body']['html'] = $this->getHtmlBody($part);
-                        }
-                    }
-
-                }
-
-            }
-        } else {
-            $message['body']['html'] = $this->getRawBody($m);
-        }
+        $message['body'] = $this->parsePart($messageId, $payload);
 
         return $message;
     }
 
     /**
+     * Parses an array of message parts and fills the $body parameter with html, text and attachments
+     *
+     * @param $messageId
+     * @param $parts
      * @param $body
-     * @return string
+     * @return array
      */
-    private function getHtmlBody($body) {
+    private function parseParts($messageId, $parts, $body){
+        foreach ($parts as $part){
+            $body = $this->parsePart($messageId, $part, $body);
+        }
 
-        return Base64Url::decode($body->getBody()->data);
+        return $body;
     }
 
     /**
+     * Parses a message part and fills the $body parameter with html, text and attachments
+     *
+     * @param $messageId
+     * @param $part
      * @param $body
+     * @return array
+     */
+    private function parsePart($messageId, $part, $body = array()){
+        if($this->isMultipart($part)){
+            $body = $this->parseParts($messageId, $part['parts'], $body);
+        }else if($this->isAttachment($part)){
+            $body = $this->parseAttachment($messageId, $part, $body);
+        }else if($this->isText($part)){
+            $body['text'] = $this->getDecodedBody($part);
+        }else{
+            $body['html'] = $this->getDecodedBody($part);
+        }
+
+        return $body;
+    }
+
+    /**
+     * Parses a part into an attachment and adds it to the $body['attachments'] array
+     *
+     * @param $messageId
+     * @param $part
+     * @param $body
+     * @return array
+     */
+    private function parseAttachment($messageId, $part, $body){
+        $body['attachments'][] = [
+            'mimeType' => $part['mimeType'],
+            'contents' => $this->getAttachment($messageId, $part['body']['attachmentId']),
+            'filename' => $part['filename'],
+        ];
+
+        return $body;
+    }
+
+    /**
+     * @param $part
+     * @return boolean
+     */
+    private function isAttachment($part){
+        return (isset($part['filename']) && !empty($part['filename']) && isset($part['body']['attachmentId']));
+    }
+
+    /**
+     * @param $part
+     * @return boolean
+     */
+    private function isMultipart($part){
+        return strpos($part['mimeType'], 'multipart') === 0;
+    }
+
+    /**
+     * @param $part
+     * @return boolean
+     */
+    private function isText($part){
+        return $part['mimeType'] == 'text/plain';
+    }
+
+    /**
+     * @param $part
      * @return string
      */
-    private function getRawBody($body) {
-        return Base64Url::decode($body->getBody()->data);
+    private function getDecodedBody($part) {
+
+        return trim(Base64Url::decode($part->getBody()->data));
     }
 
     /**
