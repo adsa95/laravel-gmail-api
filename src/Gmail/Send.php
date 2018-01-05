@@ -35,7 +35,7 @@ class Send extends Gmail
      */
     public function sendMail($to = [], $cc = [], $bcc = [], $subject = null, $message_body = null, $in_reply_to = null, $files = [], $thread_id = null)
     {
-        $message = Swift_Message::newInstance();
+        $message = new Swift_Message();
         $message->setTo($to);
 
         if (!empty($cc)) {
