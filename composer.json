@@ -17,8 +17,8 @@
     }
   ],
   "require": {
-    "php": ">=5.5.9",
-    "illuminate/support": "5.5.*",
+    "php": ">=7.0.0",
+    "illuminate/support": "^5.5",
     "google/apiclient": "^2.0",
     "nesbot/carbon": "^1.22",
     "swiftmailer/swiftmailer": "^6.0",
