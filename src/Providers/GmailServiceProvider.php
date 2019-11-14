@@ -3,7 +3,6 @@
 namespace MartijnWagena\Gmail\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use MartijnWagena\Gmail\Gmail;
 
 class GmailServiceProvider extends ServiceProvider {
 
@@ -19,9 +18,6 @@ class GmailServiceProvider extends ServiceProvider {
         $this->mergeConfigFrom(
             __DIR__.'/../../config/gmail.php', 'gmail'
         );
-
-//        $config = $this->app['config']->get('gmail');
-//        $this->app->instance('gmail', new Gmail($config));
     }
 
     public function provides()
